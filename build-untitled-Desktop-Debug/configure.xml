@@ -1,0 +1,659 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<MPUConfiguration id="mpu15310">
+	<!-- Общие параметры по UniSet -->
+		<UniSet>
+		<LocalNode name="LocalhostNode"/>
+		<RootSection name="MPU15310"/>
+		<ServicesSection name="Services"/>
+		<NameService host="localhost" port="2809"/>
+		<CountOfNet name="1"/>
+		<RepeatCount name="2"/>
+		<RepeatTimeoutMS name="50"/>
+		<ImagesPath name="images"/>
+		<SizeOfMessageQueue name="2000"/>
+		<PushMutexTimeout name="3000"/>
+		<RecvMutexTimeout name="2000"/>
+		<WatchDogTime name="0"/> <!-- [мин] -->
+		<PingNodeTime name="0"/> <!-- [сек] -->
+		<AutoStartUpTime name="1"/> <!-- [сек] -->
+		<DumpStateTime name="10"/><!-- [сек] -->
+		<SleepTickMS name="500"/><!-- [мсек] -->
+		<LocalIOR name="0"/> <!-- 1 для реальной системы (подменяется на 1 при сборке пакета); 0 - использование omniNames -->
+		<UniSetDebug name="unideb"/>
+		<!-- Если не указано, то считается текущий каталог -->
+		<ConfDir name="./"/>
+		<DataDir name="./"/>
+		<BinDir name="./"/>
+		<LogDir name="./"/>
+		<DocDir name="./"/>
+		<LockDir name="./"/>
+	</UniSet>
+	<dlog name="dlog"/>
+	<Services/>
+    <ExchangeServer name="ExchangeServer" confUpdateTime="10000" statUpdateTime="5000" conv_respond_id="LSU_Respond_FS" devRS="/dev/ttyS2" addrRS="0x01" speedRS="57600" use485="1" rs_respond_id="RS_Respond_FS" rs_askcount_id="RS_AskCount_AS" devCAN="/dev/can0" addrCAN="0x01" recv_cobidCAN="0xCEB0E1" send_cobidCAN="0xCEB0F1" baudrateCAN="250" can_respond_id="CAN1_Respond_FS" can_askcount_id="CAN_AskCount_AS" canAfterPause="0" rsAfterPause="10" timeoutCAN="5000" timeoutRS="5000" sleeppause="100" stattime="1000" servtimeout="6000" reinittimeout="300000" minMID="0" maxMID="65535" cwt_h="CommonWorkTime_H_AS" cwt_m="CommonWorkTime_M_AS" cwt_d="CommonWorkTime_D_AS" sc="FQC_StartNumber_AS" wt_h="WorkTime_H_AS" wt_m="WorkTime_M_AS" counter_wt="WorkTimeCounter_AS" counter_wt_maxsub="100" counter_sc="FQC_StartCounter_AS" counter_sc_maxsub="30"/>
+	<MBSlave1 name="MBSlave1"/>
+	<MBSlave2 name="MBSlave2"/>
+	<MBTCPMultiMaster1 name="MBTCPMultiMaster1" exchangeModeID="MPU1_Exchange_FS" polltime="200" timeout="5000" checktime="2000">
+		<DeviceList>
+			<item addr="0x01" force="1" invert="1" respondSensor="MPU1_GUI_Not_Respond_S" timeout="5300"/>
+		</DeviceList>
+		<GateList>
+			<item ip="192.168.177.3" port="502" respondInitTimeout="9000" timeout="2000" recv_timeout="500" force="1" invert="1" respondSensor="MPU1_GUI_Not_Respond1_S"/>
+			<item ip="192.168.178.3" port="502" respondInitTimeout="9000" timeout="2000" recv_timeout="500" force="1" invert="1" respondSensor="MPU1_GUI_Not_Respond2_S"/>
+		</GateList>
+  	</MBTCPMultiMaster1>
+    <MBTCPMultiMaster2 name="MBTCPMultiMaster2" exchangeModeID="MPU2_Exchange_FS" polltime="200" timeout="5000" checktime="2000">
+		<DeviceList>
+			<item addr="0x01" force="1" invert="1" respondSensor="MPU2_GUI_Not_Respond_S" timeout="5300"/>
+		</DeviceList>
+		<GateList>
+			<item ip="gate21" port="502" respondInitTimeout="9000" timeout="2000" recv_timeout="500" force="1" invert="1" respondSensor="MPU2_GUI_Not_Respond1_S"/>
+			<item ip="gate22" port="502" respondInitTimeout="9000" timeout="2000" recv_timeout="500" force="1" invert="1" respondSensor="MPU2_GUI_Not_Respond2_S"/>
+		</GateList>
+  	</MBTCPMultiMaster2>
+  <CommonLamp iotype="DI" name="GateCommonLamp" out="SVU_Respond_FS">
+    <item iotype="DI" name="SVU1_Respond_FS"/>
+    <item iotype="DI" name="SVU2_Respond_FS"/>
+  </CommonLamp>
+	<SharedMemory name="SharedMemory" shmID="SharedMemory1"/>
+	<SharedMemory1 name="SharedMemory1" shmID="SharedMemory1"/>
+	<SharedMemoryGUI name="SharedMemoryGUI" shmID="SharedMemoryGUI"/>
+    	<!-- ConfInterface находится в самом начале раздела (seek=0), его размер 25000 байт -->
+	<ConfInterface name="ConfInterface" file="/dev/hda2" byte_size="25000" inf_size="40" inf_count="100" block_number="5" block_lim="100" seek="0"/>
+	<HeartBeatTime time_msec="5000"/>
+	<rslog name="rslog"/>
+	<canlog name="canlog"/>
+  <StorInterface name="StorInterface" dbfile="conf.db" dbadmin="ctl-sqlite-dbadmin.sh"/>
+  <DumpInterface name="DumpInterface" dbfile="dump.db" dbadmin="ctl-sqlite-dbadmin.sh"/>
+  <EmergencyDumpInterface name="EmergencyDumpInterface" dbfile="emergency.db" dbadmin="ctl-sqlite-dbadmin.sh"/>
+  <Control name="Control1" Local="FQC1_LocalControl_S" SVU="FQC1_SVUControl_S" LocalSVU="MPU1_LocalSVU_S" CurRPM_AS="MPU1_Vsetting_AC" TargetRPM_AS="MPU1_GEU_RPM_Ctrl" Mode="T_AS"/>
+  <State name="State1" speed="MPU1_FC_Speed" power="MPU1_FC_P" speedtarget="MPU1_FC_RPM_Ctrl" powertarget="MPU1_FC_P_Ctrl"/>
+	<Setting name="Setting1"/>
+	<State name="State1"/>
+	<ObjectsMap idfromfile="1" no_dep="1">
+<!--
+	Краткие пояснения к полям секции 'sensors'
+	==========================================
+		Формат записей:
+	name		- наименование датчика
+	textname	- смысловое назначение датчика.
+	iotype		- тип датчика: "DI" - дискретный, "AI" - аналоговый.
+	safety		- Безопасное значение, выставляемое при завершении процесса в/в.
+				(при штатном и аварийном). Значение по умолчанию "0".
+				"-1" - означает не менять состояние выхода при завершении работы.
+				Т.е. сохраняется последнее состояние.
+				Для этого значения определена константа NoSafetyState
+				определённая в KochegarTypes.h 
+	Калибровка аналоговых датчиков
+	==============================
+	cmin		- минимальное калиброванное заначение
+	cmax		- максимальное калиброванное заначение
+	rmin		- минимальное "сырое" заначение (соответствующее cmin)
+	rmax		- максимальное "сырое" заначение (соответствующее cmax)
+	precision	- Точность. Определяет количество цифр после запятой. Т.к. в системе для хранения
+					аналоговых величин используется long. 
+					То значение датчика будет равно: Val(факстическое)*10^precision.
+				И чтобы его использовать необходимо не забывать делить.
+				Т.е. float val = getValue(Sensor_AS)/pow10(precision);
+	Специальные поля
+	================
+	title 		- элементы c этим полем - являются "ложными" датчиками. И на самом деле используются
+					в GUI формирования заголовков в списках.
+	breakpage	- признак начала новой страницы при формировании списка
+	winDrive,winFQC,winTrans,winPN и т.п. - идентификаторы для фомирования списков отображаемых параметров
+	val_type	- тип отображения значения
+				"" 			- как есть(аналоговое)
+				"alarm" 	- OK/Failure 	// при этом Failure, отобразится как "аварийный" цветом alarm_bgcolor
+				"warning" 	- OK/Warning 	// при этом Warning, отобразится как "предупредительный" цветом warning_bgcolor
+				"state" 	- ВКЛ/ОТКЛ	// при этом ВКЛ - отобразится цветом on_bgcolor
+	// для аналоговых величин
+	val_alarm 	- порог для отображения значения как "аварийного"
+	val_warn	- порог для отображения значения как "предупредительного"
+	alarmID		- связанный с датчиком номер alarm
+	direct	- [ "from" | "to" ]. Направление передачи (from - от контроллера, to - в контроллер).
+	vmin - минимальное разрешённое значение (при редактировании параметра)
+	vmax - максимальное разрешённое значение (при редактировании параметра)
+	h_alarm - признак того, что данный датчик включается в "авариыный след".
+-->
+	<nodes port="2809">
+		<item id="23000" name="LocalhostNode" textname="Локальный узел" ip="127.0.0.1"/>
+		<item id="23100" name="GUINode" textname="Графическая станция" ip="mpu15310-gui"/>
+	</nodes>
+	<!-- ************************ Датчики ********************** -->
+<!--
+	  w_offset  - Сдвиг по регистрам при "чтении" (по RS и CAN).
+           Т.е., например, идёт запрос на чтение регистра 0x1, а в таблице ищется регистр 0x1+r_offset
+           (это сделано для поддержания механизма "разделения" регистров на чтение и запись)
+           См. параметры confXXX и парные им w_confXXX (а также ParamList) 
+           При этом для корректной передачи по ModbusTCP id - недолжен быть больше 65535 (!)
+-->
+	<sensors name="sensors" section="Sensors" w_offset="5000">
+		<item id="20001" name="T_AS" textname="Аналоговый датчик" iotype="AI"/>
+		<item id="20002" name="T_S" textname="Дискретный датчик" iotype="DI"/>
+		<item id="20003" name="w_T_AS" textname="Аналоговый датчик запись" iotype="AI"/>
+		<item id="20004" name="r_T_AS" textname="Аналоговый датчик чтение" iotype="AI"/>
+		<item id="20005" name="a_T_S" textname="Аналоговый датчик" iotype="DI"/>
+		<!-- MPU_BEGIN_REPLACE -->
+		<!-- Датчики MPU1 (сгенерировано из csv) un: 13.12.2017 -->
+		<item id="1" name="MPU1_BI1U_А11В11_AS" textname="Температура обмотки статора 1 в фазе 1V" iotype="AI" mbreg="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1"/>
+		<item id="2" name="MPU1_BI1U_А11С11_AS" textname="Температура обмотки статора 1 в фазе 1W" iotype="AI" mbreg="2" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" winFQC1="1"/>
+		<item id="3" name="MPU1_BI1U_А12В12_AS" textname="Температура обмотки статора 1 в фазе 2U" iotype="AI" mbreg="3" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1"/>
+		<item id="4" name="MPU1_BI1U_А12С12_AS" textname="Температура обмотки статора 1 в фазе 2V" iotype="AI" mbreg="4" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" winFQC1="1"/>
+		<item id="5" name="MPU1_I_AV11_AS" textname="Температура обмотки статора 1 в фазе 2W" iotype="AI" mbreg="5" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" winFQC1="1"/>
+		<item id="6" name="MPU1_I_AV12_AS" textname="Температура сердечника статора фаза 1U" iotype="AI" mbreg="6" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" winFQC1="1"/>
+		<item id="7" name="MPU1_U_AV11_AS" textname="Температура сердечника статора фаза 1V" iotype="AI" mbreg="7" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" winFQC1="1"/>
+		<item id="8" name="MPU1_U_AV12_AS" textname="Температура сердечника статора фаза 1W" iotype="AI" mbreg="8" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" winFQC1="1"/>
+		<item id="9" name="MPU1_I_BTR11_AS" textname="Температура холодного воздуха" iotype="AI" mbreg="9" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" winFQC1="1"/>
+		<item id="10" name="MPU1_I_BTR12_AS" textname="Температура горячего воздуха" iotype="AI" mbreg="10" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" winFQC1="1"/>
+		<item id="11" name="MPU1_T_BK1_AV1_AS" textname="Температура носового подшипника" iotype="AI" mbreg="11" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="60" val_alarm="65" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="12" name="MPU1_T_BK2_AV1_AS" textname="Температура кормового подшипника" iotype="AI" mbreg="12" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="60" val_alarm="65" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="13" name="MPU1_T_BK1_UZ1AV1_AS" textname="Температура воды на входе воздухоохладителя " iotype="AI" mbreg="13" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1" winSettingTemp="1"/>
+		<item id="14" name="MPU1_T_BK2_UZ1AV1_AS" textname="Температура воды на выходе воздухоохладителя" iotype="AI" mbreg="14" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1" winSettingTemp="1"/>
+		<item id="15" name="MPU1_T_BK1_UZ2AV1_AS" textname="Температура воды на входе контура 2 блока охлаждения (БО)" iotype="AI" mbreg="15" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="16" name="MPU1_T_BK2_UZ2AV1_AS" textname="Температура воды на выходе контура 2 блока охлаждения (БО)" iotype="AI" mbreg="16" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="17" name="MPU1_T_BK3_UZ3AV1_AS" textname="Температура наиболее нагретого модуля силового секции СВ1" iotype="AI" mbreg="17" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="18" name="MPU1_T_BK4_UZ4AV1_AS" textname="Температура наиболее нагретого модуля силового секции СВ2" iotype="AI" mbreg="18" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="19" name="MPU1_T_BK5_AF1AV1_AS" textname="Температура наиболее нагретого модуля силового секции СИ1" iotype="AI" mbreg="19" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="20" name="MPU1_T_BK6_AF1AV1_AS" textname="Температура наиболее нагретого модуля силового секции СИ2" iotype="AI" mbreg="20" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="21" name="MPU1_Risol_AV1_AS" textname="Температура воздуха секции СФ1" iotype="AI" mbreg="21" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" winFQC1="1"/>
+		<item id="22" name="MPU1_UZ121_State_AS" textname="Температура воздуха секции СФ2" iotype="AI" mbreg="22" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" winFQC1="1"/>
+		<item id="23" name="MPU1_UZ131_State_AS" textname="Статус температуры обмотки статора 1 в фазе 1V" iotype="AI" winFQC1="1" winFQCTemp1="1"/>
+		<item id="24" name="MPU1_BIU2_А11В11_AS" textname="Статус температуры обмотки статора 1 в фазе 1W" iotype="AI" mbreg="24" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1"/>
+		<item id="25" name="MPU1_BIU2_А11С11_AS" textname="Статус температуры обмотки статора 1 в фазе 2U" iotype="AI" mbreg="25" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" winFQC1="1"/>
+		<item id="26" name="MPU1_BIU2_А12В12_AS" textname="Статус температуры обмотки статора 1 в фазе 2V" iotype="AI" mbreg="26" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1"/>
+		<item id="27" name="MPU1_BIU2_А12С12_AS" textname="Статус температуры обмотки статора 1 в фазе 2W" iotype="AI" mbreg="27" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" winFQC1="1"/>
+		<item id="28" name="MPU1_I_AV21_AS" textname="Статус температуры сердечника статора фаза 1U" iotype="AI" mbreg="28" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" winFQC1="1"/>
+		<item id="29" name="MPU1_I_AV22_AS" textname="Статус температуры сердечника статора фаза 1V" iotype="AI" mbreg="29" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" winFQC1="1"/>
+		<item id="30" name="MPU1_U_AV21_AS" textname="Статус температуры сердечника статора фаза 1W" iotype="AI" mbreg="30" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" winFQC1="1"/>
+		<item id="31" name="MPU1_U_AV22_AS" textname="Статус температуры холодного воздуха" iotype="AI" mbreg="31" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" winFQC1="1"/>
+		<item id="32" name="MPU1_I_BTR21_AS" textname="Статус температуры горячего воздуха" iotype="AI" mbreg="32" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" winFQC1="1"/>
+		<item id="33" name="MPU1_I_BTR22_AS" textname="Статус температуры носового подшипника" iotype="AI" mbreg="33" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" winFQC1="1"/>
+		<item id="34" name="MPU1_T_BK1_AV2_AS" textname="Статус температуры кормового подшипника" iotype="AI" mbreg="34" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="60" val_alarm="65" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="35" name="MPU1_T_BK2_AV2_AS" textname="Статус температуры воды на входе воздухоохладителя " iotype="AI" mbreg="35" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="60" val_alarm="65" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="36" name="MPU1_T_BK1_UZ1AV2_AS" textname="Статус температуры воды на выходе воздухоохладителя" iotype="AI" mbreg="36" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="37" name="MPU1_T_BK2_UZ1AV2_AS" textname="Статус температуры воды на входе контура 2 блока охлаждения (БО)" iotype="AI" mbreg="37" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="38" name="MPU1_T_BK1_UZ2AV2_AS" textname="Статус температуры воды на выходе контура 2 блока охлаждения (БО)" iotype="AI" mbreg="38" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="39" name="MPU1_T_BK2_UZ2AV2_AS" textname="Статус температуры наиболее нагретого модуля силового секции СВ1" iotype="AI" mbreg="39" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="40" name="MPU1_T_BK3_UZ3AV2_AS" textname="Статус температуры наиболее нагретого модуля силового секции СВ2" iotype="AI" mbreg="40" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="41" name="MPU1_T_BK4_UZ4AV2_AS" textname="Статус температуры наиболее нагретого модуля силового секции СИ1" iotype="AI" mbreg="41" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="42" name="MPU1_T_BK5_AF1AV2_AS" textname="Статус температуры наиболее нагретого модуля силового секции СИ2" iotype="AI" mbreg="42" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="43" name="MPU1_T_BK6_AF1AV2_AS" textname="Статус температуры воздуха секции СФ1" iotype="AI" mbreg="43" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="44" name="MPU1_Risol_AV2_AS" textname="Статус температуры воздуха секции СФ2" iotype="AI" mbreg="44" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" winFQC1="1"/>
+		<item id="45" name="MPU1_I_U1AI1_AS" textname="Перегрев дросселя фильтра L3 секции СФ2" iotype="AI" mbreg="47" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" winFQC1="1"/>
+		<item id="46" name="MPU1_I_V1AI1_AS" textname="Перегрев дросселя фильтра L4 секции СФ2" iotype="AI" mbreg="48" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" winFQC1="1"/>
+		<item id="47" name="MPU1_I_W1AI1_AS" textname="Перегрев воздуха секции СВП1" iotype="AI" mbreg="49" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" winFQC1="1"/>
+		<item id="48" name="MPU1_T_BK1_AI1_AS" textname="Перегрев воздуха секции СВП2" iotype="AI" mbreg="50" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="49" name="MPU1_T_BK2_AI1_AS" textname="Перегрев воздуха секции СФ1" iotype="AI" mbreg="51" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="50" name="MPU1_T_BK1_UZ1AI1_AS" textname="Перегрев воздуха секции СФ2" iotype="AI" mbreg="52" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="51" name="MPU1_T_BK2_UZ1AI1_AS" textname="Перегрев воздуха секции СВ1" iotype="AI" mbreg="53" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="52" name="MPU1_T_BK1_UZ2AI1_AS" textname="Перегрев воздуха секции СВ2" iotype="AI" mbreg="54" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="53" name="MPU1_T_BK2_UZ2AI1_AS" textname="Перегрев воздуха секции СИ1" iotype="AI" mbreg="55" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="54" name="MPU1_T_BK3_AF1AI1_AS" textname="Перегрев воздуха секции СИ2" iotype="AI" mbreg="56" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="55" name="MPU1_T_BK4_AF2AI1_AS" textname="Перегрев воздуха секции СУ" iotype="AI" mbreg="57" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="56" name="MPU1_T_BK5_AF3AI1_AS" textname="Срабатывание плавких вставок канала 2 СИ1" iotype="AI" winFQC1="1" winFQCTemp1="1"/>
+		<item id="57" name="MPU1_I_U1AI2_AS" textname="Срабатывание плавких вставок канала 3 СИ1" iotype="AI" mbreg="59" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" winFQC1="1"/>
+		<item id="58" name="MPU1_I_V1AI2_AS" textname="Срабатывание плавких вставок канала 1 СИ2" iotype="AI" mbreg="60" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" winFQC1="1"/>
+		<item id="59" name="MPU1_I_W1AI2_AS" textname="Выключатель автоматический силовой секции СВП1 замкнут" iotype="AI" mbreg="61" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" winFQC1="1"/>
+		<item id="60" name="MPU1_T_BK1_AI2_AS" textname="Выключатель автоматический силовой секции СВП2 замкнут" iotype="AI" mbreg="62" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="61" name="MPU1_T_BK2_AI2_AS" textname="Выключатель концевой секции СВП1" iotype="AI" mbreg="63" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="62" name="MPU1_T_BK1_UZ1AI2_AS" textname="Выключатель концевой секции СВП2" iotype="AI" mbreg="64" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="63" name="MPU1_T_BK2_UZ1AI2_AS" textname="Выключатель концевой секции СФ1" iotype="AI" mbreg="65" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="64" name="MPU1_T_BK1_UZ2AI2_AS" textname="Выключатель концевой секции СФ2" iotype="AI" mbreg="66" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="65" name="MPU1_T_BK2_UZ2AI2_AS" textname="Выключатель концевой секции СВ1" iotype="AI" mbreg="67" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="66" name="MPU1_T_BK3_AF1AI2_AS" textname="Выключатель концевой секции СВ2" iotype="AI" mbreg="68" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="67" name="MPU1_T_BK4_AF2AI2_AS" textname="Выключатель концевой секции СИ1" iotype="AI" mbreg="69" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="68" name="MPU1_T_BK5_AF3AI2_AS" textname="Выключатель концевой секции СИ2" iotype="AI" mbreg="70" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1" val_warn="45" val_alarm="50" val_max="100" fqcTemp1="1" winFQCTemp1="1"/>
+		<item id="69" name="MPU1_LocalSVU_S" textname="Местное/дистанционное управление" iotype="DI" mbreg="138" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1"/>
+		<item id="70" name="MPU1_MasterSlave_S" textname="Ведомый/ведущий(0-ведомый 1-ведущий)" iotype="DI" mbreg="135" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1"/>
+		<item id="71" name="MPU1_SettingMode_AC" textname="Режим задания" iotype="AI" mbreg="125" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1"/>
+		<item id="72" name="MPU1_Psetting1_AC" textname="Задание по мощности 1" iotype="AI" mbreg="127" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="3" noprecision="1"/>
+		<item id="73" name="MPU1_Psetting2_AC" textname="Задание по мощности 2" iotype="AI" mbreg="128" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="3" noprecision="1"/>
+		<item id="74" name="MPU1_Vsetting_AC" textname="Задание по скорости вращения" iotype="AI" mbreg="126" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1"/>
+		<item id="75" name="MPU1_Mode_AS" textname="Состояние ПЧ" iotype="AI" mbreg="130" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1"/>
+		<item id="76" name="MPU1_Confirm_S" textname="Квитирование" iotype="DI" mbreg="191" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" h_alarm="1"/>
+		<item id="77" name="MPU1_CoolingSys_TFlow2_AS" textname="температура подающего тр-да контура 2" iotype="AI" mbreg="0" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1"/>
+		<item id="78" name="MPU1_CoolingSys_TReturn2_AS" textname="температура обратного тр-да контура 2" iotype="AI" mbreg="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1"/>
+		<item id="79" name="MPU1_CoolingSys_PFlow2_AS" textname="давление подающего тр-да контура 2 " iotype="AI" mbreg="2" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1"/>
+		<item id="80" name="MPU1_CoolingSys_PFlow1_AS" textname="давление подающего тр-да контура 1" iotype="AI" mbreg="3" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1"/>
+		<item id="81" name="MPU1_CoolingSys_PReturn1_AS" textname="давление в обратном трубопроводе контура 1" iotype="AI" mbreg="4" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1"/>
+		<item id="82" name="MPU1_CoolingSys_PAfterH1H2_AS" textname="давление после циркуляционных насосов Н1 Н2" iotype="AI" mbreg="5" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1"/>
+		<item id="83" name="MPU1_CoolingSys_PReturn2_AS" textname="давление в обратном трубопроводе контура 2" iotype="AI" mbreg="6" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1"/>
+		<item id="84" name="MPU1_CoolingSys_Ppower_AS" textname="давление в системе подпитки" iotype="AI" mbreg="7" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="1"/>
+		<item id="85" name="MPU1_CoolingSys_H1StateWork_AS" textname="Статус насоса Н1 Работает" iotype="DI" mbreg="10" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" nbit="0" precision="1"/>
+		<item id="86" name="MPU1_CoolingSys_H1StateAlarm_AS" textname="Статус насоса Н1 Авария" iotype="DI" mbreg="10" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" nbit="1" precision="1"/>
+		<item id="87" name="MPU1_CoolingSys_H2StateWork_AS" textname="Статус насоса Н2 Работает" iotype="DI" mbreg="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" nbit="0" precision="1"/>
+		<item id="88" name="MPU1_CoolingSys_H2StateAlarm_AS" textname="Статус насоса Н2 Авария" iotype="DI" mbreg="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" nbit="1" precision="1"/>
+		<item id="89" name="MPU1_CoolingSys_H3StateWork_AS" textname="Статус насоса подпитки (Н3) Работает" iotype="DI" mbreg="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" nbit="0" precision="1"/>
+		<item id="90" name="MPU1_CoolingSys_H3StateAlarm_AS" textname="Статус насоса подпитки (Н3) Авария" iotype="DI" mbreg="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" nbit="1" precision="1"/>
+		<item id="91" name="MPU1_CoolingSys_K2StateOpen_AS " textname="Статус клапана подпитки (К2) Открыт" iotype="DI" mbreg="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" nbit="0" precision="1"/>
+		<item id="92" name="MPU1_CoolingSys_K2StateAlarm_AS " textname="Статус клапана подпитки (К2) Авария" iotype="DI" mbreg="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" nbit="1" precision="1"/>
+		<item id="93" name="MPU1_CoolingSys_SystemWork_AS " textname="Статус системы Работает" iotype="DI" mbreg="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" nbit="0" precision="1"/>
+		<item id="94" name="MPU1_Status_title" textname="Статусы" iotype="AI" winSetting="1" title="1"/>
+		<item id="95" name="MPU1_CoolingSys_SystemState_AS " textname="Статус системы Выход на режим" iotype="DI" mbreg="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" nbit="1" winSetting="1" precision="1"/>
+		<item id="96" name="MPU1_CoolingSys_SystemStateAlarm_AS " textname="Статус системы Авария общая" iotype="DI" mbreg="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" nbit="2" winSetting="1" precision="1"/>
+		<item id="97" name="MPU1_Temp1_AS" textname="Temp1_AS" iotype="AI"/>
+		<item id="98" name="MPU1_Temp2_AS" textname="Temp2_AS" iotype="AI"/>
+		<item id="99" name="MPU1_Temp3_AS" textname="Temp3_AS" iotype="AI"/>
+		<item id="100" name="MPU1_Rectifier_1_title" textname="Выпрямитель 1" iotype="AI" winSettingTemp="1" title="1"/>
+		<item id="101" name="MPU1_Tmax_Rectifier_1_A" textname="Температура наиболее нагретого силового модуля выпрямителя 1 фазы A" iotype="AI" mbreg="256" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="102" name="MPU1_Tmax_Rectifier_1_B" textname="Температура наиболее нагретого силового модуля выпрямителя 1 фазы B" iotype="AI" mbreg="258" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="103" name="MPU1_Tmax_Rectifier_1_C" textname="Температура наиболее нагретого силового модуля выпрямителя 1 фазы C" iotype="AI" mbreg="260" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="104" name="MPU1_Rectifier_2_title" textname="Выпрямитель 2" iotype="AI" winSettingTemp="1" title="1"/>
+		<item id="105" name="MPU1_Tmax_Rectifier_2_A" textname="Температура наиболее нагретого силового модуля выпрямителя 2 фазы A" iotype="AI" mbreg="262" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="106" name="MPU1_Tmax_Rectifier_2_B" textname="Температура наиболее нагретого силового модуля выпрямителя 2 фазы B" iotype="AI" mbreg="264" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="107" name="MPU1_Tmax_Rectifier_2_C" textname="Температура наиболее нагретого силового модуля выпрямителя 2 фазы C" iotype="AI" mbreg="266" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="108" name="MPU1_Inverter_1_title" textname="Инвертор 1" iotype="AI" winSettingTemp="1" title="1"/>
+		<item id="109" name="MPU1_Tmax_Inverter_1_A" textname="Температура наиболее нагретого силового модуля инвертора 1 фазы A" iotype="AI" mbreg="268" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="110" name="MPU1_Tmax_Inverter_1_B" textname="Температура наиболее нагретого силового модуля инвертора 1 фазы B" iotype="AI" mbreg="270" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="111" name="MPU1_Tmax_Inverter_1_C" textname="Температура наиболее нагретого силового модуля инвертора 1 фазы C" iotype="AI" mbreg="272" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="112" name="MPU1_Inverter_2_title" textname="Инвертор 2" iotype="AI" winSettingTemp="1" title="1"/>
+		<item id="113" name="MPU1_Tmax_Inverter_2_A" textname="Температура наиболее нагретого силового модуля инвертора 2 фазы A" iotype="AI" mbreg="274" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="114" name="MPU1_Tmax_Inverter_2_B" textname="Температура наиболее нагретого силового модуля инвертора 2 фазы B" iotype="AI" mbreg="276" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="115" name="MPU1_Tmax_Inverter_2_C" textname="Температура наиболее нагретого силового модуля инвертора 2 фазы C" iotype="AI" mbreg="278" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="116" name="MPU1_Stator_title" textname="Обмотка статора" iotype="AI" winSettingTemp="1" title="1"/>
+		<item id="117" name="MPU1_PT100_GED_Stator_Winding_U" textname="Температура обмотки статора в фазе U" iotype="AI" mbreg="280" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="118" name="MPU1_PT100_GED_Stator_Winding_V" textname="Температура обмотки статора в фазе V" iotype="AI" mbreg="282" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="119" name="MPU1_PT100_GED_Stator_Winding_W" textname="Температура обмотки статора в фазе W" iotype="AI" mbreg="284" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="120" name="MPU1_Stator_Core_title" textname="Сердечник статора" iotype="AI" winSettingTemp="1" title="1"/>
+		<item id="121" name="MPU1_PT100_GED_Stator_Core_U" textname="Температура сердечника статора фаза U" iotype="AI" mbreg="286" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="122" name="MPU1_PT100_GED_Stator_Core_V" textname="Температура сердечника статора фаза V" iotype="AI" mbreg="288" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="123" name="MPU1_PT100_GED_Stator_Core_W" textname="Температура сердечника статора фаза W" iotype="AI" mbreg="290" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="124" name="MPU1_PT100_title" textname="Температура в секциях" iotype="AI" winSettingTemp="1" title="1"/>
+		<item id="125" name="MPU1_PT100_Air_SF1" textname="Температура воздуха секции СФ1" iotype="AI" mbreg="292" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="126" name="MPU1_PT100_Air_SF2" textname="Температура воздуха секции СФ2" iotype="AI" mbreg="294" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="127" name="MPU1_PT100_Air_SVP1" textname="Температура воздуха секции СВП1" iotype="AI" mbreg="296" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="128" name="MPU1_PT100_Air_SVP2" textname="Температура воздуха секции СВП2" iotype="AI" mbreg="298" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="129" name="MPU1_PT100_Air_SU" textname="Температура воздуха секции СУ" iotype="AI" mbreg="300" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="130" name="MPU1_PT100_Air_SV1" textname="Температура воздуха секции СВ1" iotype="AI" mbreg="302" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="131" name="MPU1_PT100_Air_SV2" textname="Температура воздуха секции СВ2" iotype="AI" mbreg="304" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="132" name="MPU1_PT100_Air_SI1" textname="Температура воздуха секции СИ1" iotype="AI" mbreg="306" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="133" name="MPU1_PT100_Air_SI2" textname="Температура воздуха секции СИ2" iotype="AI" mbreg="308" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="134" name="MPU1_PT100_L1_SF1" textname="Температура дросселя L1 секции СФ1" iotype="AI" mbreg="310" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="135" name="MPU1_PT100_L2_SF1" textname="Температура дросселя L2 секции СФ1" iotype="AI" mbreg="312" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="136" name="MPU1_PT100_L3_SF1" textname="Температура дросселя L3 секции СФ1" iotype="AI" mbreg="314" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="137" name="MPU1_PT100_L4_SF1" textname="Температура дросселя L4 секции СФ1" iotype="AI" mbreg="316" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="138" name="MPU1_PT100_L1_SF2" textname="Температура дросселя L1 секции СФ2" iotype="AI" mbreg="318" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="139" name="MPU1_PT100_L2_SF2" textname="Температура дросселя L2 секции СФ2" iotype="AI" mbreg="320" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="140" name="MPU1_PT100_L3_SF2" textname="Температура дросселя L3 секции СФ2" iotype="AI" mbreg="322" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="141" name="MPU1_PT100_L4_SF2" textname="Температура дросселя L4 секции СФ2" iotype="AI" mbreg="324" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="142" name="MPU1_T_Bearing1" textname="Температура носового подшипника ГЭД" iotype="AI" mbreg="326" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="143" name="MPU1_T_Bearing2" textname="Температура кормового подшипника ГЭД" iotype="AI" mbreg="328" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSettingTemp="1" winSetting="1" vtype="F2"/>
+		<item id="144" name="MPU1_Tmax_Rectifier_1_A_Status" textname="Статус температуры наиболее нагретого силового модуля выпрямителя 1 фазы A" iotype="AI" mbreg="330" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="145" name="MPU1_Tmax_Rectifier_1_B_Status" textname="Статус температуры наиболее нагретого силового модуля выпрямителя 1 фазы B" iotype="AI" mbreg="331" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="146" name="MPU1_Tmax_Rectifier_1_C_Status" textname="Статус температуры наиболее нагретого силового модуля выпрямителя 1 фазы C" iotype="AI" mbreg="332" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="147" name="MPU1_Tmax_Rectifier_2_A_Status" textname="Статус температуры наиболее нагретого силового модуля выпрямителя 2 фазы A" iotype="AI" mbreg="333" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="148" name="MPU1_Tmax_Rectifier_2_B_Status" textname="Статус температуры наиболее нагретого силового модуля выпрямителя 2 фазы B" iotype="AI" mbreg="334" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="149" name="MPU1_Tmax_Rectifier_2_C_Status" textname="Статус температуры наиболее нагретого силового модуля выпрямителя 2 фазы C" iotype="AI" mbreg="335" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="150" name="MPU1_Tmax_Inverter_1_A_Status" textname="Статус температуры наиболее нагретого силового модуля инвертора 1 фазы A" iotype="AI" mbreg="336" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="151" name="MPU1_Tmax_Inverter_1_B_Status" textname="Статус температуры наиболее нагретого силового модуля инвертора 1 фазы B" iotype="AI" mbreg="337" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="152" name="MPU1_Tmax_Inverter_1_C_Status" textname="Статус температуры наиболее нагретого силового модуля инвертора 1 фазы C" iotype="AI" mbreg="338" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="153" name="MPU1_Tmax_Inverter_2_A_Status" textname="Статус температуры наиболее нагретого силового модуля инвертора 2 фазы A" iotype="AI" mbreg="339" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="154" name="MPU1_Tmax_Inverter_2_B_Status" textname="Статус температуры наиболее нагретого силового модуля инвертора 2 фазы B" iotype="AI" mbreg="340" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="155" name="MPU1_Tmax_Inverter_2_C_Status" textname="Статус температуры наиболее нагретого силового модуля инвертора 2 фазы C" iotype="AI" mbreg="341" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="156" name="MPU1_PT100_GED_Stator_Winding_U_Status" textname="Статус температуры обмотки статора в фазе U" iotype="AI" mbreg="342" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="157" name="MPU1_PT100_GED_Stator_Winding_V_Status" textname="Статус температуры обмотки статора в фазе V" iotype="AI" mbreg="343" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="158" name="MPU1_PT100_GED_Stator_Winding_W_Status" textname="Статус температуры обмотки статора в фазе W" iotype="AI" mbreg="344" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="159" name="MPU1_PT100_GED_Stator_Core_U_Status" textname="Статус температуры сердечника статора фаза U" iotype="AI" mbreg="345" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="160" name="MPU1_PT100_GED_Stator_Core_V_Status" textname="Статус температуры сердечника статора фаза V" iotype="AI" mbreg="346" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="161" name="MPU1_PT100_GED_Stator_Core_W_Status" textname="Статус температуры сердечника статора фаза W" iotype="AI" mbreg="347" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="162" name="MPU1_PT100_Air_SF1_Status" textname="Статус температуры воздуха секции СФ1" iotype="AI" mbreg="348" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="163" name="MPU1_PT100_Air_SF2_Status" textname="Статус температуры воздуха секции СФ2" iotype="AI" mbreg="349" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="164" name="MPU1_PT100_Air_SVP1_Status" textname="Статус температуры воздуха секции СВП1" iotype="AI" mbreg="350" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="165" name="MPU1_PT100_Air_SVP2_Status" textname="Статус температуры воздуха секции СВП2" iotype="AI" mbreg="351" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="166" name="MPU1_PT100_L1_SF1_Status" textname="Статус температуры воздуха секции СУ" iotype="AI" mbreg="352" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="167" name="MPU1_PT100_L2_SF1_Status" textname="Статус температуры воздуха секции СВ1" iotype="AI" mbreg="353" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="168" name="MPU1_PT100_L3_SF1_Status" textname="Статус температуры воздуха секции СВ2" iotype="AI" mbreg="354" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="169" name="MPU1_PT100_L4_SF1_Status" textname="Статус температуры воздуха секции СИ1" iotype="AI" mbreg="355" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="170" name="MPU1_PT100_L1_SF2_Status" textname="Статус температуры воздуха секции СИ2" iotype="AI" mbreg="356" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="171" name="MPU1_PT100_L2_SF2_Status" textname="Статус температуры дросселя L1 секции СФ1" iotype="AI" mbreg="357" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="172" name="MPU1_PT100_L3_SF2_Status" textname="Статус температуры дросселя L2 секции СФ1" iotype="AI" mbreg="358" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="173" name="MPU1_PT100_L4_SF2_Status" textname="Статус температуры дросселя L3 секции СФ1" iotype="AI" mbreg="359" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="174" name="MPU1_PT100_Air_SU_Status" textname="Статус температуры дросселя L4 секции СФ1" iotype="AI" mbreg="360" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="175" name="MPU1_PT100_Air_SV1_Status" textname="Статус температуры дросселя L1 секции СФ2" iotype="AI" mbreg="361" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="176" name="MPU1_PT100_Air_SV2_Status" textname="Статус температуры дросселя L2 секции СФ2" iotype="AI" mbreg="362" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="177" name="MPU1_PT100_Air_SI1_Status" textname="Статус температуры дросселя L3 секции СФ2" iotype="AI" mbreg="363" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="178" name="MPU1_PT100_Air_SI2_Status" textname="Статус температуры дросселя L4 секции СФ2" iotype="AI" mbreg="364" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="179" name="MPU1_T_Bearing1_Status" textname="Статус температуры носового подшипника ГЭД" iotype="AI" mbreg="365" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="180" name="MPU1_T_Bearing2_Status" textname="Статус температуры кормового подшипника ГЭД" iotype="AI" mbreg="366" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="181" name="MPU1_Pump1_Status" textname="Статус насоса 1 гидроподпора ГЭД" iotype="AI" mbreg="367" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="182" name="MPU1_Pump2_Status" textname="Статус насоса 2 гидроподпора ГЭД" iotype="AI" mbreg="368" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="183" name="MPU1_GP_Status" textname="Статус гидроподпора ГЭД" iotype="AI" mbreg="369" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="184" name="MPU1_Brake_Status" textname="Статус тормоза ГЭД" iotype="AI" mbreg="370" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="185" name="MPU1_Control_panel" textname="Откуда ведется управление" iotype="AI" mbreg="371" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="186" name="MPU1_AVN1_title" textname="AVN1" iotype="AI" winSetting="1" title="1"/>
+		<item id="187" name="MPU1_AVN1_State" textname="АВН1:Состояние АВН" iotype="AI" mbreg="372" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="188" name="MPU1_AVN1_Auto_State" textname="АВН1:Состояние входного автомата" iotype="AI" mbreg="373" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="189" name="MPU1_AVN1_Ia" textname="АВН1:Ток фазы A" iotype="AI" mbreg="374" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="190" name="MPU1_AVN1_Ib" textname="АВН1:Ток фазы B" iotype="AI" mbreg="376" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="191" name="MPU1_AVN1_Ic" textname="АВН1:Ток фазы C" iotype="AI" mbreg="378" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="192" name="MPU1_AVN1_Uab" textname="АВН1:Напряжение AB" iotype="AI" mbreg="380" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="193" name="MPU1_AVN1_Ubc" textname="АВН1:Напряжение BC" iotype="AI" mbreg="382" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="194" name="MPU1_AVN1_Uca" textname="АВН1:Напряжение CA" iotype="AI" mbreg="384" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="195" name="MPU1_AVN1_Uzpt" textname="АВН1:Напряжение ЗПТ" iotype="AI" mbreg="386" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="196" name="MPU1_AVN1_P" textname="АВН1:Мощность АВН" iotype="AI" mbreg="388" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="197" name="MPU1_AVN1_Voltage_zpt_setting" textname="АВН1:Уставка напряжения ЗПТ" iotype="AI" mbreg="390" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="198" name="MPU1_AVN2_title" textname="AVN2" iotype="AI" winSetting="1" title="1"/>
+		<item id="199" name="MPU1_AVN2_State" textname="АВН2:Состояние АВН" iotype="AI" mbreg="392" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="200" name="MPU1_AVN2_Auto_State" textname="АВН2:Состояние входного автомата" iotype="AI" mbreg="393" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="201" name="MPU1_AVN2_Ia" textname="АВН2:Ток фазы A" iotype="AI" mbreg="394" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="202" name="MPU1_AVN2_Ib" textname="АВН2:Ток фазы B" iotype="AI" mbreg="396" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="203" name="MPU1_AVN2_Ic" textname="АВН2:Ток фазы C" iotype="AI" mbreg="398" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="204" name="MPU1_AVN2_Uab" textname="АВН2:Напряжение AB" iotype="AI" mbreg="400" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="205" name="MPU1_AVN2_Ubc" textname="АВН2:Напряжение BC" iotype="AI" mbreg="402" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="206" name="MPU1_AVN2_Uca" textname="АВН2:Напряжение CA" iotype="AI" mbreg="404" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="207" name="MPU1_AVN2_Uzpt" textname="АВН2:Напряжение ЗПТ" iotype="AI" mbreg="406" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="208" name="MPU1_AVN2_P" textname="АВН2:Мощность АВН" iotype="AI" mbreg="408" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="209" name="MPU1_AVN2_Voltage_zpt_setting" textname="АВН2:Уставка напряжения ЗПТ" iotype="AI" mbreg="410" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="210" name="MPU1_FC_title" textname="Преобразователь" iotype="AI" winSetting="1" title="1"/>
+		<item id="211" name="MPU1_FC_State" textname="ПЧ: Состояние ПЧ" iotype="AI" mbreg="412" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="212" name="MPU1_FC_Mode_State" textname="ПЧ: Текущий режим" iotype="AI" mbreg="413" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="213" name="MPU1_FC_Power_Limitation" textname="ПЧ: Ограничение мощности по заданию" iotype="AI" mbreg="414" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="214" name="MPU1_FC_Ia1" textname="ПЧ: Ток фазы A1 " iotype="AI" mbreg="416" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="215" name="MPU1_FC_Ib1" textname="ПЧ: Ток фазы B1" iotype="AI" mbreg="418" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="216" name="MPU1_FC_Ic1" textname="ПЧ: Ток фазы C1" iotype="AI" mbreg="420" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="217" name="MPU1_FC_Ia2" textname="ПЧ: Ток фазы A2" iotype="AI" mbreg="422" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="218" name="MPU1_FC_Ib2" textname="ПЧ: Ток фазы B2" iotype="AI" mbreg="424" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="219" name="MPU1_FC_Ic2" textname="ПЧ: Ток фазы C2" iotype="AI" mbreg="426" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="220" name="MPU1_FC_Speed" textname="ПЧ: Скорость двигателя" iotype="AI" mbreg="428" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="221" name="MPU1_FC_M1" textname="ПЧ: Момент двигателя M1" iotype="AI" mbreg="430" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="222" name="MPU1_FC_M2" textname="ПЧ: Момент двигателя M2" iotype="AI" mbreg="432" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="223" name="MPU1_FC_P1" textname="ПЧ: Мощность двигателя P1" iotype="AI" mbreg="434" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="224" name="MPU1_FC_P2" textname="ПЧ: Мощность двигателя P2" iotype="AI" mbreg="436" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="225" name="MPU1_FC_P" textname="Мощность двигателя P1+P2" iotype="AI" mbreg="438" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="226" name="MPU1_FC_RPM_Ctrl" textname="ПЧ: Заданная частота вращения" iotype="AI" mbreg="440" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="227" name="MPU1_FC_RPM_Acceleration" textname="ПЧ: Уставка темпа разгона" iotype="AI" mbreg="442" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="228" name="MPU1_FC_RPM_Limit_max" textname="ПЧ: Уставка оганичения максимальной скорости" iotype="AI" mbreg="444" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="229" name="MPU1_FC_RPM_Limit_min" textname="ПЧ: Уставка оганичения минимальной скорости" iotype="AI" mbreg="446" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="230" name="MPU1_FC_P_Ctrl" textname="ПЧ: Заданная мощность мощность" iotype="AI" mbreg="448" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="231" name="MPU1_FC_P_Acceleration" textname="ПЧ: Уставка темпа набора/снижения мощности" iotype="AI" mbreg="450" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="232" name="MPU1_FC_P_Limit_max" textname="ПЧ: Уставка оганичения максимальной мощности" iotype="AI" mbreg="452" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="233" name="MPU1_FC_P_Limit_min" textname="ПЧ: Уставка оганичения минимальной мощности" iotype="AI" mbreg="454" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="234" name="MPU1_FC_Flow_attenuation_setting" textname="ПЧ: Уставка ослабления потока " iotype="AI" mbreg="456" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="235" name="MPU1_FC_Recuperation_P_setting" textname="ПЧ: Уставка мощности рекупирации" iotype="AI" mbreg="458" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="236" name="MPU1_BO_title" textname="Блок охлаждения" iotype="AI" winSetting="1" title="1"/>
+		<item id="237" name="MPU1_BO_T_Water_cold_In" textname="БО: Tхол. подача" iotype="AI" mbreg="460" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="238" name="MPU1_BO_T_Water_cold_Out" textname="БО: Tхол. обратка" iotype="AI" mbreg="462" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="239" name="MPU1_BO_P_Circuit_1_In" textname="БО: P подача контур 1" iotype="AI" mbreg="464" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="240" name="MPU1_BO_P_Circuit_1_Out" textname="БО: P обратка контур 1" iotype="AI" mbreg="466" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="241" name="MPU1_BO_P_Circuit_2_In" textname="БО: P подача контур 2" iotype="AI" mbreg="468" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="242" name="MPU1_BO_P_Circuit_2_AP_Out" textname="БО: P обратка контур 2 (после насоса)" iotype="AI" mbreg="470" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="243" name="MPU1_BO_P_Circuit_2_BP_Out" textname="БО: P обратка контур 2 (до насоса)" iotype="AI" mbreg="472" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="244" name="MPU1_BO_P_Accumulator_Tank" textname="БО: P в баке аккумулятора" iotype="AI" mbreg="474" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="245" name="MPU1_BO_P_Differential_Pump_1" textname="БО: P дифференциальное насоса 1" iotype="AI" mbreg="476" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="246" name="MPU1_BO_P_Differential_Pump_2" textname="БО: P дифференциальное насоса 2" iotype="AI" mbreg="478" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="247" name="MPU1_BO_FlowRate_Pump_1" textname="БО: Расход насоса 1" iotype="AI" mbreg="480" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="248" name="MPU1_BO_FlowRate_Pump_2" textname="БО: Расход насоса 2" iotype="AI" mbreg="482" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="249" name="MPU1_BO_Pump_1_State" textname="БО: Насос 1. Статус" iotype="AI" mbreg="484" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="250" name="MPU1_BO_Pump_2_State" textname="БО: Насос 1. Статус" iotype="AI" mbreg="485" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="251" name="MPU1_BO_Pump_1_Status" textname="БО: Статус насоса 1 (подробный)" iotype="AI" mbreg="486" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="252" name="MPU1_BO_Pump_2_Status" textname="БО: Статус насоса 2 (подробный)" iotype="AI" mbreg="487" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="253" name="MPU1_BO_Pump_1_Alarm_State" textname="БО: Код аварии насоса 1 (подробный)" iotype="AI" mbreg="488" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="254" name="MPU1_BO_Pump_2_Alarm_State" textname="БО: Код аварии насоса 2 (подробный)" iotype="AI" mbreg="489" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="255" name="MPU1_BO_Pump_3_State" textname="БО: Насос 3. Статус" iotype="AI" mbreg="490" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="256" name="MPU1_BO_Valve_2_State" textname="БО: Клапан 2. Статус" iotype="AI" mbreg="491" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="257" name="MPU1_BO_System_State" textname="БО: Система. Статус" iotype="AI" mbreg="492" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="258" name="MPU1_Brake_Remote" textname="Тормоз ГЭД в дистанционном управлении" iotype="DI" mbreg="8672" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="259" name="MPU1_GP_Pump1_On" textname="Насос 1 гидроподпора ГЭД включен" iotype="DI" mbreg="8673" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="260" name="MPU1_GP_Pump2_On" textname="Насос 2 гидроподпора ГЭД включен" iotype="DI" mbreg="8674" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="261" name="MPU1_GP_Auto" textname="Гидроподпор ГЭД в автоматическом управлении" iotype="DI" mbreg="8675" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="262" name="MPU1_GP_Remote" textname="Гидроподпор ГЭД в дистанционном управлении" iotype="DI" mbreg="8676" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="263" name="MPU1_FC_SVP1_VA_On" textname="Выключатель автоматический силовой секции СВП1 замкнут" iotype="DI" mbreg="8677" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="264" name="MPU1_FC_SVP2_VA_On" textname="Выключатель автоматический силовой секции СВП2 замкнут" iotype="DI" mbreg="8678" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="265" name="MPU1_PC_Heartbeat" textname="Серцебиение панельника" iotype="DI" mbreg="4096" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="266" name="MPU1_PC_AVN1_Voltage_zpt_set" textname="АВН1 задать уставку напряжения ЗПТ" iotype="DI" mbreg="4097" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="267" name="MPU1_PC_AVN2_Voltage_zpt_set" textname="АВН2 задать уставку напряжения ЗПТ" iotype="DI" mbreg="4098" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="268" name="MPU1_PC_FC_Flow_attenuation_set" textname="ПЧ задать уставку ослабления потока " iotype="DI" mbreg="4099" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="269" name="MPU1_PC_FC_Recuperation_P_set" textname="ПЧ задать уставку мощности рекупирации" iotype="DI" mbreg="4100" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="270" name="MPU1_PC_FC_RPM_set" textname="ПЧ задать уставку частоты вращения" iotype="DI" mbreg="4101" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="271" name="MPU1_PC_AVN1_Voltage_zpt_setting" textname="АВН1 Уставка напряжения ЗПТ" iotype="AI" mbreg="258" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="272" name="MPU1_PC_AVN2_Voltage_zpt_setting" textname="АВН2 Уставка напряжения ЗПТ" iotype="AI" mbreg="260" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="273" name="MPU1_PC_FC_Flow_attenuation_setting" textname="ПЧ Уставка ослабления потока " iotype="AI" mbreg="262" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="274" name="MPU1_PC_FC_Recuperation_P_setting" textname="ПЧ Уставка мощности рекупирации" iotype="AI" mbreg="264" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="275" name="MPU1_PC_FC_RPM_setting" textname="ПЧ Уставка частоты вращения" iotype="AI" mbreg="266" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+		<item id="276" name="MPU1_PC_Sound_OFF" textname="Снятие звука" iotype="DI" mbreg="4102" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="PLC" winSetting="1"/>
+		<item id="277" name="MPU1_GEU_RPM_Ctrl" textname="Задание по скорости вращения" iotype="AI" mbreg="290" mbtype="rtu" mbfunc="0x10" mbaddr="0x01" tcpmb="PLC" winSetting="1" vtype="F2"/>
+
+
+		<!-- Датчики w_MPU1 (сгенерировано из csv) un: 13.12.2017 -->
+		<item id="5071" name="w_MPU1_SettingMode_AC" textname="Режим задания" iotype="AI" mbreg="125" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1"/>
+		<item id="5072" name="w_MPU1_Psetting1_AC" textname="Задание по мощности 1" iotype="AI" mbreg="127" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="3" noprecision="1"/>
+		<item id="5073" name="w_MPU1_Psetting2_AC" textname="Задание по мощности 2" iotype="AI" mbreg="128" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1" precision="3" noprecision="1"/>
+		<item id="5074" name="w_MPU1_Vsetting_AC" textname="Задание по скорости вращения" iotype="AI" mbreg="126" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" tcpmb="MPU1"/>
+			<!-- MPU_END_REPLACE -->
+			<!-- MPU_CONST_BEGIN_REPLACE -->
+		<!-- Датчики MPU1 (сгенерировано из csv) un: 13.12.2017 -->
+		<item id="300" name="TKAK0_AS" textname="TKAK0" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="600"/>
+		<item id="301" name="TKAK1_AS" textname="TKAK0" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="601"/>
+		<item id="302" name="TKAK2_AS" textname="TKAK0" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="602"/>
+		<item id="303" name="TKAK3_AS" textname="TKAK0" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="603"/>
+		<item id="304" name="w_TKAK0_AS" textname="TKAK0" iotype="AI" mbtype="rtu" mbfunc="0x06" mbaddr="0x01" mbreg="5600"/>
+		<item id="305" name="w_TKAK1_AS" textname="TKAK0" iotype="AI" mbtype="rtu" mbfunc="0x06" mbaddr="0x01" mbreg="5601"/>
+		<item id="306" name="w_TKAK2_AS" textname="TKAK0" iotype="AI" mbtype="rtu" mbfunc="0x06" mbaddr="0x01" mbreg="5602"/>
+		<item id="307" name="w_TKAK3_AS" textname="TKAK0" iotype="AI" mbtype="rtu" mbfunc="0x06" mbaddr="0x01" mbreg="5603"/>
+		<item id="308" name="A5_AS" textname="Состояние A5" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="604"/>
+		<item id="309" name="A6_AS" textname="Состояние A6" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="605"/>
+		<item id="310" name="A9_AS" textname="Состояние A9" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="606"/>
+		<item id="311" name="A10_AS" textname="Состояние A10" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="607"/>
+		<item id="312" name="A2_AS" textname="Состояние A2" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="608"/>
+		<item id="313" name="A3_AS" textname="Состояние A3" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="609"/>
+		<item id="314" name="A4_AS" textname="Состояние A4" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="610"/>
+		<item id="315" name="Test_ErrCode_AS" textname="(Тест): код аварии (биты)" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="611"/>
+		<item id="316" name="A11_AS" textname="A11_Out" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="612"/>
+		<item id="317" name="A12_AS" textname="A12_Out" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="613"/>
+		<item id="318" name="A13_AS" textname="A13_Out" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="614"/>
+		<item id="319" name="w_A11_AS" textname="A11_Out" iotype="AI" mbtype="rtu" mbfunc="0x06" mbaddr="0x01" mbreg="5612"/>
+		<item id="320" name="w_A12_AS" textname="A12_Out" iotype="AI" mbtype="rtu" mbfunc="0x06" mbaddr="0x01" mbreg="5613"/>
+		<item id="321" name="w_A13_AS" textname="A13_Out" iotype="AI" mbtype="rtu" mbfunc="0x06" mbaddr="0x01" mbreg="5614"/>
+		<item id="322" name="T1_AS" textname="T1 mks" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="615"/>
+		<item id="323" name="T2_AS" textname="T2 mks" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="616"/>
+		<item id="324" name="w_T1_AS" textname="T1 mks" iotype="AI" mbtype="rtu" mbfunc="0x06" mbaddr="0x01" mbreg="5615"/>
+		<item id="325" name="w_T2_AS" textname="T2 mks" iotype="AI" mbtype="rtu" mbfunc="0x06" mbaddr="0x01" mbreg="5616"/>
+		<item id="326" name="TestComm_AS" textname="Comm testreg" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="617"/>
+		<item id="327" name="w_TestComm_AS" textname="Comm testreg" iotype="AI" mbtype="rtu" mbfunc="0x06" mbaddr="0x01" mbreg="5617"/>
+		<item id="328" name="RS_ErrCount_AS" textname="Кол-во ошибок связи по RS" winLSUDDD="1" iotype="AI" unsigned="1" tcp_vtype="I2" mb_vtype="I2" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" default="0" initOK="1" mbreg="1064"/>
+		<item id="329" name="CAN_ErrCount_AS" textname="Кол-во ошибок связи по CAN" winLSUDDD="1" iotype="AI" unsigned="1" tcp_vtype="I2" mb_vtype="I2" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" default="0" initOK="1" mbreg="1066"/>
+		<item id="330" name="REG450_AS" textname="Reg 450: read" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="450"/>
+		<item id="331" name="REG451_AS" textname="Reg 451: read" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="451"/>
+		<item id="332" name="REG452_AS" textname="Reg 452: read" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="452"/>
+		<item id="333" name="REG453_AS" textname="Reg 453: read" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="453"/>
+		<item id="334" name="REG454_AS" textname="Reg 454: read" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="454"/>
+		<item id="335" name="REG455_AS" textname="Reg 455: read" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="455"/>
+		<item id="336" name="REG456_AS" textname="Reg 456: read" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="456"/>
+		<item id="337" name="REG457_AS" textname="Reg 457: read" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="457"/>
+		<item id="338" name="REG458_AS" textname="Reg 458: read" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="458"/>
+		<item id="339" name="REG459_AS" textname="Reg 459: read" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="459"/>
+		<item id="340" name="REG460_AS" textname="Reg 460: read" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="460"/>
+		<item id="341" name="REG461_AS" textname="Reg 461: read" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="461"/>
+		<item id="342" name="REG462_AS" textname="Reg 462: read" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="462"/>
+		<item id="343" name="REG463_AS" textname="Reg 463: read" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="463"/>
+		<item id="344" name="REG464_AS" textname="Reg 464: read" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="464"/>
+		<item id="345" name="REG465_AS" textname="Reg 465: read" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="465"/>
+		<item id="346" name="REG466_AS" textname="Reg 466: read" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="466"/>
+		<item id="347" name="REG467_AS" textname="Reg 467: read" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="467"/>
+		<item id="348" name="REG468_AS" textname="Reg 468: read" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="468"/>
+		<item id="349" name="REG469_AS" textname="Reg 469: read" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="469"/>
+		<item id="350" name="REG470_AS" textname="Reg 470: read" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="470"/>
+		<item id="351" name="w_REG450_AS" textname="Reg 450: write | 22870.2: Удалённый сброс защиты" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="5450"/>
+		<item id="352" name="w_REG451_AS" textname="Reg 451: write" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="5451"/>
+		<item id="353" name="w_REG452_AS" textname="Reg 452: write" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="5452"/>
+		<item id="354" name="w_REG453_AS" textname="Reg 453: write" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="5453"/>
+		<item id="355" name="w_REG454_AS" textname="Reg 454: write" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="5454"/>
+		<item id="356" name="w_REG455_AS" textname="Reg 455: write" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="5455"/>
+		<item id="357" name="w_REG456_AS" textname="Reg 456: write" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="5456"/>
+		<item id="358" name="w_REG457_AS" textname="Reg 457: write" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="5457"/>
+		<item id="359" name="w_REG458_AS" textname="Reg 458: write" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="5458"/>
+		<item id="360" name="w_REG459_AS" textname="Reg 459: write" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="5459"/>
+		<item id="361" name="w_REG460_AS" textname="Reg 460: write" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="5460"/>
+		<item id="362" name="w_REG461_AS" textname="Reg 461: write" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="5461"/>
+		<item id="363" name="w_REG462_AS" textname="Reg 462: write" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="5462"/>
+		<item id="364" name="w_REG463_AS" textname="Reg 463: write" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="5463"/>
+		<item id="365" name="w_REG464_AS" textname="Reg 464: write" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="5464"/>
+		<item id="366" name="w_REG465_AS" textname="Reg 465: write" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="5465"/>
+		<item id="367" name="w_REG466_AS" textname="Reg 466: write" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="5466"/>
+		<item id="368" name="w_REG467_AS" textname="Reg 467: write" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="5467"/>
+		<item id="369" name="w_REG468_AS" textname="Reg 468: write" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="5468"/>
+		<item id="370" name="w_REG469_AS" textname="Reg 469: write" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="5469"/>
+		<item id="371" name="w_REG470_AS" textname="Reg 470: write" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="5470"/>
+		<item id="372" name="ERR01_AS" textname="СЛОВО 01 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="548" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="373" name="ERR02_AS" textname="СЛОВО 02 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="549" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="374" name="ERR03_AS" textname="СЛОВО 03 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="550" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="375" name="ERR04_AS" textname="СЛОВО 04 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="551" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="376" name="ERR05_AS" textname="СЛОВО 05 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="552" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="377" name="ERR06_AS" textname="СЛОВО 06 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="553" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="378" name="ERR07_AS" textname="СЛОВО 07 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="554" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="379" name="ERR08_AS" textname="СЛОВО 08 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="555" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="380" name="ERR09_AS" textname="СЛОВО 09 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="556" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="381" name="ERR10_AS" textname="СЛОВО 10 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="557" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="382" name="ERR11_AS" textname="СЛОВО 11 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="558" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="383" name="ERR12_AS" textname="СЛОВО 12 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="559" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="384" name="ERR13_AS" textname="СЛОВО 13 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="560" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="385" name="ERR14_AS" textname="СЛОВО 14 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="561" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="386" name="ERR15_AS" textname="СЛОВО 15 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="562" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="387" name="ERR16_AS" textname="СЛОВО 16 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="563" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="388" name="ERR17_AS" textname="СЛОВО 17 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="564" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="389" name="ERR18_AS" textname="СЛОВО 18 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="565" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="390" name="ERR19_AS" textname="СЛОВО 19 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="566" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="391" name="ERR20_AS" textname="СЛОВО 20 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="567" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="392" name="ERR21_AS" textname="СЛОВО 21 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="568" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="393" name="ERR22_AS" textname="СЛОВО 22 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="569" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="394" name="ERR23_AS" textname="СЛОВО 23 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="570" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="395" name="ERR24_AS" textname="СЛОВО 24 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="571" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="396" name="ERR25_AS" textname="СЛОВО 25 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="572" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="397" name="ERR26_AS" textname="СЛОВО 26 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="573" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="398" name="ERR27_AS" textname="СЛОВО 27 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="574" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="399" name="ERR28_AS" textname="СЛОВО 28 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="575" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="400" name="ERR29_AS" textname="СЛОВО 29 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="576" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="401" name="ERR30_AS" textname="СЛОВО 30 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="577" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="402" name="ERR31_AS" textname="СЛОВО 31 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="578" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="403" name="ERR32_AS" textname="СЛОВО 32 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="579" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="404" name="ERR33_AS" textname="СЛОВО 33 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="580" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="405" name="ERR34_AS" textname="СЛОВО 34 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="581" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="406" name="ERR35_AS" textname="СЛОВО 34 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="582" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="407" name="ERR36_AS" textname="СЛОВО 34 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="583" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="408" name="ERR37_AS" textname="СЛОВО 34 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="584" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="409" name="ERR38_AS" textname="СЛОВО 34 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="585" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="410" name="ERR39_AS" textname="СЛОВО 34 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="586" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="411" name="ERR40_AS" textname="СЛОВО 34 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="587" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="412" name="ERR41_AS" textname="СЛОВО 34 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="588" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="413" name="ERR42_AS" textname="СЛОВО 34 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="589" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="414" name="ERR43_AS" textname="СЛОВО 34 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="590" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="415" name="ERR44_AS" textname="СЛОВО 34 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="591" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="416" name="ERR45_AS" textname="СЛОВО 34 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="592" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="417" name="ERR46_AS" textname="СЛОВО 34 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="593" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="418" name="ERR47_AS" textname="СЛОВО 34 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="594" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="419" name="ERR48_AS" textname="СЛОВО 34 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="595" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="420" name="ERR49_AS" textname="СЛОВО 34 битов неисправностей" iotype="AI" unsigned="1" mbtype="rtu" mbfunc="0x03" mbaddr="0x01" mbreg="596" tcpmb="MPU1" direct="from" vtype="F2"/>
+		<item id="421" name="WorkTimeCounter_AS" textname="Счётчик времени работы, сек" iotype="AI" unsigned="1" default="0" mbreg="368"/>
+		<item id="422" name="WorkTime_H_AS" textname="Время работы, часов" iotype="AI" unsigned="1" tcp_vtype="I2" mb_vtype="I2" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" default="0" initOK="1" mbreg="1052"/>
+		<item id="423" name="WorkTime_M_AS" textname="Время работы, минут" iotype="AI" unsigned="1" tcp_vtype="I2" mb_vtype="I2" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" default="0" initOK="1" mbreg="1054"/>
+		<item id="424" name="CommonWorkTime_D_AS" textname="Общее время работы, дней" iotype="AI" unsigned="1" tcp_vtype="I2" mb_vtype="I2" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" default="0" initOK="1" mbreg="1056"/>
+		<item id="425" name="CommonWorkTime_H_AS" textname="Общее время работы, часов" iotype="AI" unsigned="1" tcp_vtype="I2" mb_vtype="I2" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" default="0" initOK="1" mbreg="1058"/>
+		<item id="426" name="CommonWorkTime_M_AS" textname="Общее время работы, минут" iotype="AI" unsigned="1" tcp_vtype="I2" mb_vtype="I2" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" default="0" initOK="1" mbreg="1060"/>
+		<item id="427" name="FQC_StartCounter_AS" textname="Счётчик пусков" iotype="AI" unsigned="1" default="0" mbreg="370"/>
+		<item id="428" name="FQC_StartNumber_AS" textname="Общее количество пусков" iotype="AI" unsigned="1" tcp_vtype="I2" mb_vtype="I2" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" default="0" initOK="1" mbreg="1062"/>
+		<item id="429" name="UpdateVersion_S" textname="Обновить информацию о версии сборки" iotype="DI" mbreg="200004"/>
+		<item id="430" name="CycleSaveState_AS" textname="Состояние процесса циклической записи" iotype="AI" mbreg="200005"/>
+		<item id="431" name="FlashState_AS" textname="flash disk state" iotype="AI" mbtype="rtu" mbfunc="0x06" mbaddr="0x01" mbreg="1070"/>
+		<item id="432" name="SVU_Respond_FS" textname="Наличие связи с СВУ1" iotype="DI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="1036"/>
+		<item id="433" name="SVU1_Respond_FS" textname="Наличие связи с СВУ1" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="1036"/>
+		<item id="434" name="SVU2_Respond_FS" textname="Наличие связи с СВУ2" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="1036"/>
+		<item id="435" name="LSU_Respond_FS" textname="Наличие связи с ЛСУ" iotype="DI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="1037"/>
+		<item id="436" name="LSU1_Respond_FS" textname="Наличие связи с ЛСУ(Текущий)" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="1037"/>
+		<item id="437" name="LSU2_Respond_FS" textname="Наличие связи с ЛСУ(Удаленный)" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="1037"/>
+		<item id="438" name="Conv1_Respond_FS" textname="Наличие связи с конвертором интерфейсов 1" iotype="AI" default="0" mbreg="1038"/>
+		<item id="439" name="Conv2_Respond_FS" textname="Наличие связи с конвертором интерфейсов 2" iotype="AI" default="0" mbreg="1038"/>
+		<item id="440" name="RS_Respond_FS" textname="Наличие связи по RS485" iotype="DI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="1039"/>
+		<item id="441" name="CAN1_Respond_FS" textname="Наличие связи по CAN на текущем ПЧ" iotype="DI" ioinvert="1" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="1040"/>
+		<item id="442" name="CAN2_Respond_FS" textname="Наличие связи по CAN на удаленном ПЧ" iotype="DI" ioinvert="1" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="1042"/>
+		<item id="443" name="LSU_AskAllCount_AS" deault="0" textname="Кол-во сеансов связи с ЛСУ" iotype="AI" unsigned="1" tcp_vtype="I2" mb_vtype="I2" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" initOK="1" mbreg="1041"/>
+		<item id="444" name="RS_AskCount_AS" default="0" textname="Кол-во сеансов связи по RS" iotype="AI" unsigned="1" tcp_vtype="I2" mb_vtype="I2" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" initOK="1" mbreg="1043"/>
+		<item id="445" name="CAN_AskCount_AS" default="0" textname="Кол-во сеансов связи по CAN" iotype="AI" unsigned="1" tcp_vtype="I2" mb_vtype="I2" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" initOK="1" mbreg="1045"/>
+		<item id="446" name="SVU_AskCount_AS" default="0" textname="Кол-во сеансов связи по СВУ" iotype="AI" unsigned="1" tcp_vtype="I2" mb_vtype="I2" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" initOK="1" mbreg="1047"/>
+		<item id="447" name="TestMode_S" textname="test mode" iotype="DI" mbreg="1031"/>
+		<item id="448" name="Pulsar_S" textname="pulsar sensor" iotype="AI" mbreg="4096" mbtype="rtu" mbfunc="0x10" mbaddr="0x01" tcpmb="MPU"/>
+		<item id="449" name="ksuEnablePowerLimit1_S" textname="Ограничение мощности ПЧ1 включено" winFQCDDD="1" iotype="DI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="330" tcpmb="MPU"/>
+		<item id="450" name="ksuEnablePowerLimit2_S" textname="Ограничение мощности ПЧ2 включено" winFQCDDD="1" iotype="DI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="331" tcpmb="MPU"/>
+		<item id="451" name="Trans11State_AS" textname="Состояние трансформатора 11" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" h_alarm="1" mbreg="325" tcpmb="MPU"/>
+		<item id="452" name="Trans12State_AS" textname="Состояние трансформатора 12" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" h_alarm="1" mbreg="527" tcpmb="MPU"/>
+		<item id="453" name="Trans21State_AS" textname="Состояние трансформатора 21" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" h_alarm="1" mbreg="528" tcpmb="MPU"/>
+		<item id="454" name="Trans22State_AS" textname="Состояние трансформатора 22" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" h_alarm="1" mbreg="529" tcpmb="MPU"/>
+		<item id="455" name="UMP1State_AS" textname="Состояние трансформатора 21" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" h_alarm="1" mbreg="530" tcpmb="MPU"/>
+		<item id="456" name="UMP2State_AS" textname="Состояние трансформатора 22" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" h_alarm="1" mbreg="531" tcpmb="MPU"/>
+		<item id="457" name="QTV1State_AS" textname="Состояние QTV1" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" h_alarm="1" mbreg="536" tcpmb="MPU"/>
+		<item id="458" name="QTV2State_AS" textname="Состояние QTV2" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" h_alarm="1" mbreg="537" tcpmb="MPU"/>
+		<item id="459" name="FQC21CState_AS" textname="Состояние емкости ПЧ21" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" h_alarm="1" mbreg="540" tcpmb="MPU"/>
+		<item id="460" name="FQC22CState_AS" textname="Состояние емкости ПЧ22" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" h_alarm="1" mbreg="541" tcpmb="MPU"/>
+		<item id="461" name="FQC31CState_AS" textname="Состояние емкости ПЧ31" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" h_alarm="1" mbreg="542" tcpmb="MPU"/>
+		<item id="462" name="FQC32CState_AS" textname="Состояние емкости ПЧ32" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" h_alarm="1" mbreg="543" tcpmb="MPU"/>
+		<item id="463" name="FQC11QBlock_AS" textname="Блокировка Q ПЧ11" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" h_alarm="1" mbreg="544" tcpmb="MPU"/>
+		<item id="464" name="FQC12QBlock_AS" textname="Блокировка Q ПЧ12" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" h_alarm="1" mbreg="545" tcpmb="MPU"/>
+		<item id="465" name="FQC21QBlock_AS" textname="Блокировка Q ПЧ21" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" h_alarm="1" mbreg="546" tcpmb="MPU"/>
+		<item id="466" name="FQC22QBlock_AS" textname="Блокировка Q ПЧ22" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" h_alarm="1" mbreg="547" tcpmb="MPU"/>
+		<item id="467" name="FQC31QBlock_AS" textname="Блокировка Q ПЧ31" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" h_alarm="1" mbreg="548" tcpmb="MPU"/>
+		<item id="468" name="FQC32QBlock_AS" textname="Блокировка Q ПЧ32" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" h_alarm="1" mbreg="549" tcpmb="MPU"/>
+		<item id="469" name="FQC1_BlockStart_FS" textname="Блокировка пуска ПЧ1" iotype="DI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="550" tcpmb="MPU"/>
+		<item id="470" name="FQC2_BlockStart_FS" textname="Блокировка пуска ПЧ2" iotype="DI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="551" tcpmb="MPU"/>
+		<item id="471" name="FQC3_BlockStart_FS" textname="Блокировка пуска ПЧ3" iotype="DI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="552" tcpmb="MPU"/>
+		<item id="472" name="FQC1_Master_S" textname="ПЧ1 Ведущий" iotype="DI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="553" tcpmb="MPU"/>
+		<item id="473" name="FQC1_Slave_S" textname="ПЧ1 Ведомый" iotype="DI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="554" tcpmb="MPU"/>
+		<item id="474" name="FQC1_LocalControl_S" textname="ПЧ Местное управление" iotype="DI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="559" tcpmb="MPU"/>
+		<item id="475" name="FQC1_SVUControl_S" textname="ПЧ СВУ управление" iotype="DI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="560" tcpmb="MPU"/>
+		<item id="476" name="RealPowerFQC1_AS" textname="Текущая мощность ПЧ1, кВт" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="563" tcpmb="MPU"/>
+		<item id="477" name="SetTargetPowerFQC1_AS" textname="Заданная текущая мощность ПЧ1, кВт" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="564" tcpmb="MPU"/>
+		<item id="478" name="RealPowerFQC2_AS" textname="Текущая мощность ПЧ2, кВт" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="565" tcpmb="MPU"/>
+		<item id="479" name="SetTargetPowerFQC2_AS" textname="Заданная текущая мощность ПЧ2, кВт" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" mbreg="566" tcpmb="MPU"/>
+		<item id="480" name="GED_CurRPM_AS" textname="Текущие обороты ГЭД" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" h_alarm="1" mbreg="293" tcpmb="MPU"/>
+		<item id="481" name="GED_TargetRPM_AS" textname="Текущие заданные обороты ГЭД" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" h_alarm="1" mbreg="320" tcpmb="MPU"/>
+		<item id="482" name="FQC_JournalAlarmN_AS" textname="Количество неквитированных аварий" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" h_alarm="1" mbreg="567" tcpmb="MPU"/>
+		<item id="483" name="FQC_JournalN_AS" textname="Количество сообщений в журнале" iotype="AI" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" h_alarm="1" mbreg="568" tcpmb="MPU"/>
+		<item id="484" name="MPU1_Exchange_FS" textname="Статус MBTCPMultiMaster 1" iotype="DI"/>
+		<item id="485" name="MPU1_GUI_Not_Respond_S" textname="Статус MBTCPMultiMaster 1" iotype="DI"/>
+		<item id="486" name="MPU1_GUI_Not_Respond1_S" textname="Связь MBTCPMultiMaster 1 1 канал" iotype="DI"/>
+		<item id="487" name="MPU1_GUI_Not_Respond2_S" textname="Статус MBTCPMultiMaster 1 2 канал" iotype="DI"/>
+		<item id="488" name="MPU2_Exchange_FS" textname="Статус MBTCPMultiMaster 2" iotype="DI"/>
+		<item id="489" name="MPU2_GUI_Not_Respond_S" textname="Статус MBTCPMultiMaster 2" iotype="DI"/>
+		<item id="490" name="MPU2_GUI_Not_Respond1_S" textname="Связь MBTCPMultiMaster 2 1 канал" iotype="DI"/>
+		<item id="491" name="MPU2_GUI_Not_Respond2_S" textname="Статус MBTCPMultiMaster 2 2 канал" iotype="DI"/>
+		<item id="492" name="MPU1_LSU_CurController_AS" textname="Рабочий контроллер" winLSUDDD="1" iotype="AI" mbreg="175" mbtype="rtu" mbfunc="0x04" mbaddr="0x01" default="1" tcpmb="MPU"/>
+		<item id="493" name="Empty_AS" textname=" Пустой аналоговый датчик" iotype="AI"/>
+		<item id="494" name="Empty_S" textname=" Пустой дискретный датчик" iotype="DI"/>
+		<!-- MPU_CONST_END_REPLACE -->
+	</sensors>
+	<thresholds section="sensors">
+	</thresholds>
+	<!-- ******************* Идентификаторы контроллеров ***************** -->
+	<controllers name="controllers" section="Controllers">
+		<item id="3000" name="NullController1"/>
+		<item id="3001" name="NullController2"/>
+		<item id="3002" name="NullController3"/>
+		<item id="3003" name="NetExchange1"/>
+		<item id="3004" name="NetConverter1"/>
+		<item id="3005" name="SharedMemory1"/>
+		<item id="3006" name="SharedMemoryGUI"/>
+	</controllers>
+	<!-- ******************* Идентификаторы сервисов ***************** -->
+	<services name="Services" section="Services">
+		<item id="3007" name="GUI_Activator"/>
+	</services>
+	<!-- ******************* Идентификаторы объектов ***************** -->
+	<objects name="objects" section="Objects">
+		<item id="4000" name="TestProc"/>
+		<item id="4001" name="DigitalSensorViewer"/>
+		<item id="4002" name="AnalogSensorViewer"/>
+		<item id="4003" name="GUIManager1"/>
+		<item id="4040" name="MBSlaveGUI"/>
+		<item id="4041" name="MBMaster1"/>
+		<item id="4043" name="FlashLed"/>
+		<item id="4044" name="MBSlaveSVU"/>
+		<item id="4048" name="MBSlaveSVU2"/>
+		<item id="4049" name="Control1"/>
+		<item id="4050" name="Setting1"/>
+		<item id="4051" name="State1"/>
+		<item id="4053" name="MBSlave1"/>
+		<item id="4054" name="MBSlave2"/>
+		<item id="4055" name="GateCommonLamp"/>
+        <item id="4056" name="MBTCPMultiMaster1"/>
+        <item id="4057" name="MBTCPMultiMaster2"/>        
+	</objects>
+	</ObjectsMap>
+</MPUConfiguration>
